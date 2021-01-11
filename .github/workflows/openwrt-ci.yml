@@ -18,8 +18,8 @@ on:
   #     ↑↑↑ 改成你的分支名, 一般是master
   #schedule:
   #  - cron: 0 20 * * *
-    release:
-      types: [published]
+  # release:
+  #   types: [published]
 
 jobs:
   build_openwrt:
@@ -52,6 +52,10 @@ jobs:
           sed -i 's/#src-git helloworld/src-git helloworld/g' ./feeds.conf.default
           ./scripts/feeds update -a
           ./scripts/feeds install -a
+          cd package
+          mkdir openwrt-packages
+          cd openwrt-packages
+          git clone https://github.com/istoliving/openwrt-udp2raw.git
 
       - name: Costom configure file
         run: |
@@ -140,6 +144,11 @@ jobs:
           CONFIG_PACKAGE_luci-proto-wireguard=y
           CONFIG_PACKAGE_wireguard=y
           CONFIG_PACKAGE_wireguard-tools=y
+          EOF
+
+          # udp2raw支持
+          cat >> .config <<EOF
+          CONFIG_PACKAGE_udp2raw-tunnel=y
           EOF
 
           # 常用LuCI插件选择:
